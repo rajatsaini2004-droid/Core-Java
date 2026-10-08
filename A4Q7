@@ -1,0 +1,118 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+
+public class CalculatorForm extends JFrame implements ActionListener {
+    private JTextField txtDisplay;
+    private double num1 = 0, num2 = 0, result = 0;
+    private char operator = ' ';
+    private boolean startNewInput = true;
+
+    public CalculatorForm() {
+        setTitle("Calculator");
+        setSize(250, 300);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setResizable(false);
+        setLocationRelativeTo(null);
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BorderLayout(10, 10));
+        mainPanel.setBackground(Color.BLUE);
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        txtDisplay = new JTextField();
+        txtDisplay.setHorizontalAlignment(JTextField.LEFT);
+        txtDisplay.setEditable(false);
+        txtDisplay.setBackground(Color.WHITE);
+        txtDisplay.setFont(new Font("Arial", Font.BOLD, 14));
+        mainPanel.add(txtDisplay, BorderLayout.NORTH);
+
+        JPanel gridPanel = new JPanel();
+        gridPanel.setLayout(new GridLayout(4, 4, 5, 5));
+        gridPanel.setBackground(Color.BLUE);
+
+        String[] buttons = {
+            "+", "1", "2", "3",
+            "-", "4", "5", "6",
+            "*", "7", "8", "9",
+            "/", ".", "0", "C"
+        };
+
+        for (String text : buttons) {
+            JButton button = new JButton(text);
+            button.addActionListener(this);
+            button.setFocusPainted(false);
+            gridPanel.add(button);
+        }
+        mainPanel.add(gridPanel, BorderLayout.CENTER);
+
+        JPanel bottomPanel = new JPanel();
+        bottomPanel.setBackground(Color.BLUE);
+        bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        
+        JButton btnEq = new JButton("=");
+        btnEq.setPreferredSize(new Dimension(50, 25));
+        btnEq.addActionListener(this);
+        bottomPanel.add(btnEq);
+        mainPanel.add(bottomPanel, BorderLayout.SOUTH);
+
+        add(mainPanel);
+        setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+
+        try {
+            if (command.matches("[0-9]") || command.equals(".")) {
+                if (startNewInput) {
+                    txtDisplay.setText("");
+                    startNewInput = false;
+                }
+                txtDisplay.setText(txtDisplay.getText() + command);
+            } 
+            else if (command.matches("[+\\-*/]")) {
+                num1 = Double.parseDouble(txtDisplay.getText());
+                operator = command.charAt(0);
+                startNewInput = true;
+            } 
+            else if (command.equals("=")) {
+                num2 = Double.parseDouble(txtDisplay.getText());
+                
+                switch (operator) {
+                    case '+': result = num1 + num2; break;
+                    case '-': result = num1 - num2; break;
+                    case '*': result = num1 * num2; break;
+                    case '/': 
+                        if (num2 == 0) {
+                            txtDisplay.setText("Error: Div by 0");
+                            startNewInput = true;
+                            return;
+                        }
+                        result = num1 / num2; 
+                        break;
+                }
+                
+                String sNum1 = (num1 == (long) num1) ? String.valueOf((long) num1) : String.valueOf(num1);
+                String sNum2 = (num2 == (long) num2) ? String.valueOf((long) num2) : String.valueOf(num2);
+                
+                txtDisplay.setText(sNum1 + operator + sNum2 + "=" + result);
+                startNewInput = true; // Prepare for next fresh calculation
+            } 
+            else if (command.equals("C")) {
+                txtDisplay.setText("");
+                num1 = num2 = result = 0;
+                operator = ' ';
+                startNewInput = true;
+            }
+        } catch (NumberFormatException ex) {
+            txtDisplay.setText("");
+            startNewInput = true;
+        }
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(() -> new CalculatorForm());
+    }
+}
