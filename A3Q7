@@ -1,0 +1,69 @@
+class TicketBooking {
+    int availableSeats;
+
+    public TicketBooking(int availableSeats) {
+        this.availableSeats = availableSeats;
+    }
+
+    public synchronized void bookSeat(String user, int seats) {
+        if (availableSeats >= seats) {
+            System.out.println(user + " booked " + seats + " seat(s) successfully");
+            availableSeats -= seats;
+        } else {
+            System.out.println(user + " booking failed. Not enough seats");
+        }
+    }
+}
+
+class User1 extends Thread {
+    TicketBooking booking;
+    int seatsToBook;
+
+    public User1(TicketBooking booking, int seatsToBook) {
+        this.booking = booking;
+        this.seatsToBook = seatsToBook;
+    }
+
+    @Override
+    public void run() {
+        booking.bookSeat("User1", seatsToBook);
+    }
+}
+
+class User2 extends Thread {
+    TicketBooking booking;
+    int seatsToBook;
+
+    public User2(TicketBooking booking, int seatsToBook) {
+        this.booking = booking;
+        this.seatsToBook = seatsToBook;
+    }
+
+    @Override
+    public void run() {
+        booking.bookSeat("User2", seatsToBook);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        System.out.println("Available Seats: 2");
+        System.out.println("User1 wants to book: 1");
+        System.out.println("User2 wants to book: 2\n");
+
+        TicketBooking sharedBooking = new TicketBooking(2);
+
+        User1 user1 = new User1(sharedBooking, 1);
+        User2 user2 = new User2(sharedBooking, 2);
+
+        user1.start();
+        
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            System.out.println(e);
+        }
+        
+        user2.start();
+    }
+}
