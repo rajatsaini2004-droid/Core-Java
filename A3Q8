@@ -1,0 +1,53 @@
+import java.util.Scanner;
+
+class PrinterJob implements Runnable {
+    int jobId;
+    String studentName;
+
+    public PrinterJob(int jobId, String studentName) {
+        this.jobId = jobId;
+        this.studentName = studentName;
+    }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("Printing job " + jobId + " by " + studentName);
+            
+            Thread.sleep(1000); 
+        } catch (InterruptedException e) {
+            System.out.println("Print job " + jobId + " was interrupted.");
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Number of print jobs: ");
+        int numberOfJobs = scanner.nextInt();
+        
+        char studentLetter = 'A';
+
+        for (int i = 1; i <= numberOfJobs; i++) {
+            String studentName = "Student " + studentLetter;
+            
+            PrinterJob myJob = new PrinterJob(i, studentName);
+            
+            Thread printThread = new Thread(myJob);
+            
+            printThread.start();
+            
+            try {
+                Thread.sleep(50);
+            } catch (InterruptedException e) {
+                System.out.println(e);
+            }
+            
+            studentLetter++;
+        }
+
+        scanner.close();
+    }
+}
