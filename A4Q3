@@ -1,0 +1,92 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class BankDirectory {
+    private HashMap<Integer, String> accounts;
+
+    public BankDirectory() {
+        accounts = new HashMap<>();
+    }
+
+    public void addAccount(int accNo, String customerName) {
+        if (accounts.containsKey(accNo)) {
+            System.out.println("Error: Account " + accNo + " already exists for " + accounts.get(accNo));
+        } else {
+            accounts.put(accNo, customerName);
+            System.out.println("Account added successfully.");
+        }
+    }
+
+    public void getCustomer(int accNo) {
+        if (accounts.containsKey(accNo)) {
+            System.out.println("Account No: " + accNo + " → " + accounts.get(accNo));
+        } else {
+            System.out.println("Account No: " + accNo + " not found.");
+        }
+    }
+
+    public void displayAll() {
+        if (accounts.isEmpty()) {
+            System.out.println("The directory is currently empty.");
+            return;
+        }
+
+        System.out.println("\n--- All Account Records ---");
+        for (Map.Entry<Integer, String> entry : accounts.entrySet()) {
+            System.out.println("Account No: " + entry.getKey() + " → " + entry.getValue());
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        BankDirectory bank = new BankDirectory();
+
+        while (true) {
+            System.out.println("\n1. Add Account");
+            System.out.println("2. Get Customer Name");
+            System.out.println("3. Display All Accounts");
+            System.out.println("4. Exit");
+            System.out.print("Enter choice: ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Please enter a valid numeric choice.");
+                scanner.next();
+                continue;
+            }
+
+            int choice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Account No: ");
+                    int accNo = scanner.nextInt();
+                    scanner.nextLine();
+                    System.out.print("Enter Customer Name: ");
+                    String name = scanner.nextLine().trim();
+                    bank.addAccount(accNo, name);
+                    break;
+
+                case 2:
+                    System.out.print("Enter Account No: ");
+                    int searchAcc = scanner.nextInt();
+                    scanner.nextLine();
+                    bank.getCustomer(searchAcc);
+                    break;
+
+                case 3:
+                    bank.displayAll();
+                    break;
+
+                case 4:
+                    System.out.println("Exiting directory. Goodbye!");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid option. Please choose between 1 and 4.");
+            }
+        }
+    }
+}
