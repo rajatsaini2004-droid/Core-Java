@@ -1,0 +1,97 @@
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Scanner;
+
+public class Inventory {
+    private HashMap<Integer, Integer> stockMap;
+
+    public Inventory() {
+        stockMap = new HashMap<>();
+    }
+
+    public void addProduct(int productId, int stock) {
+        if (stockMap.containsKey(productId)) {
+            System.out.println("Error: Product " + productId + " already exists. Use 'Update Stock' instead.");
+        } else {
+            stockMap.put(productId, stock);
+            System.out.println("Product " + productId + " added with stock " + stock);
+        }
+    }
+
+    public void updateStock(int productId, int newStock) {
+        if (stockMap.containsKey(productId)) {
+            stockMap.put(productId, newStock);
+            System.out.println("Product " + productId + " updated to new stock " + newStock);
+        } else {
+            System.out.println("Error: Product " + productId + " not found in inventory.");
+        }
+    }
+
+    public void displayInventory() {
+        if (stockMap.isEmpty()) {
+            System.out.println("The inventory is currently empty.");
+            return;
+        }
+
+        System.out.println("\n--- Current Inventory ---");
+        
+        Iterator<Map.Entry<Integer, Integer>> iterator = stockMap.entrySet().iterator();
+        
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, Integer> entry = iterator.next();
+            System.out.println("Product ID: " + entry.getKey() + " → Stock: " + entry.getValue());
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Inventory inventory = new Inventory();
+
+        while (true) {
+            System.out.println("\n1. Add Product");
+            System.out.println("2. Update Stock");
+            System.out.println("3. Display Inventory");
+            System.out.println("4. Exit");
+            System.out.print("Enter choice: ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Please enter a valid numeric choice.");
+                scanner.next();
+                continue;
+            }
+
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Product ID: ");
+                    int addId = scanner.nextInt();
+                    System.out.print("Enter Stock: ");
+                    int addStock = scanner.nextInt();
+                    inventory.addProduct(addId, addStock);
+                    break;
+
+                case 2:
+                    System.out.print("Enter Product ID: ");
+                    int updateId = scanner.nextInt();
+                    System.out.print("Enter New Stock: ");
+                    int newStock = scanner.nextInt();
+                    inventory.updateStock(updateId, newStock);
+                    break;
+
+                case 3:
+                    inventory.displayInventory();
+                    break;
+
+                case 4:
+                    System.out.println("Exiting Inventory System. Goodbye!");
+                    scanner.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid option. Please choose between 1 and 4.");
+            }
+        }
+    }
+}
