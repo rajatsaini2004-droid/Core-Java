@@ -1,0 +1,184 @@
+import java.awt.*;
+import java.awt.event.*;
+
+public class StudentRegistrationForm extends Frame implements ActionListener {
+    private TextField txtName, txtFather, txtAge;
+    private CheckboxGroup genderGroup;
+    private Checkbox rbMale, rbFemale;
+    private Choice chCourse;
+    private Checkbox cbDrawing, cbSinging, cbMusic, cbOthers;
+    private TextArea txtAddress;
+    private Button btnSave, btnClear;
+
+    public StudentRegistrationForm() {
+        setTitle("User Registration Form");
+        setSize(520, 680);
+        setLayout(new FlowLayout(FlowLayout.CENTER, 10, 12));
+        setBackground(new Color(45, 52, 60));
+        setResizable(false);
+
+        Label lblTitle = new Label("Registration Form", Label.CENTER);
+        lblTitle.setFont(new Font("Arial", Font.BOLD, 22));
+        lblTitle.setForeground(Color.YELLOW);
+        lblTitle.setPreferredSize(new Dimension(480, 35));
+        add(lblTitle);
+
+        txtName = new TextField(26);
+        add(createRow("Name", txtName));
+
+        txtFather = new TextField(26);
+        add(createRow("Father Name", txtFather));
+
+        txtAge = new TextField(26);
+        add(createRow("Age", txtAge));
+
+        genderGroup = new CheckboxGroup();
+        rbMale = new Checkbox("Male", genderGroup, true);
+        rbFemale = new Checkbox("Female", genderGroup, false);
+        rbMale.setForeground(Color.WHITE);
+        rbFemale.setForeground(Color.WHITE);
+        
+        Panel genderPanel = new Panel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        genderPanel.add(rbMale);
+        genderPanel.add(rbFemale);
+        add(createRow("Gender", genderPanel));
+
+        chCourse = new Choice();
+        chCourse.add("Java");
+        chCourse.add("Python");
+        chCourse.add("C++");
+        chCourse.add("Web Development");
+        chCourse.setPreferredSize(new Dimension(215, 25));
+        add(createRow("Course", chCourse));
+
+        cbDrawing = new Checkbox("Drawing");
+        cbSinging = new Checkbox("Singing");
+        cbMusic = new Checkbox("Music");
+        cbOthers = new Checkbox("Others");
+        
+        Color white = Color.WHITE;
+        cbDrawing.setForeground(white);
+        cbSinging.setForeground(white);
+        cbMusic.setForeground(white);
+        cbOthers.setForeground(white);
+
+        Panel hobbyPanel = new Panel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        hobbyPanel.add(cbDrawing);
+        hobbyPanel.add(cbSinging);
+        hobbyPanel.add(cbMusic);
+        hobbyPanel.add(cbOthers);
+        add(createRow("Hobbies", hobbyPanel));
+
+        txtAddress = new TextArea("", 4, 26, TextArea.SCROLLBARS_VERTICAL_ONLY);
+        add(createRow("Address", txtAddress));
+
+        Panel buttonPanel = new Panel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttonPanel.setPreferredSize(new Dimension(480, 50));
+
+        btnSave = new Button("Save Details");
+        btnSave.setBackground(new Color(0, 102, 204));
+        btnSave.setForeground(Color.WHITE);
+        btnSave.setPreferredSize(new Dimension(110, 32));
+        btnSave.addActionListener(this);
+
+        btnClear = new Button("Clear All");
+        btnClear.setBackground(new Color(204, 0, 0));
+        btnClear.setForeground(Color.WHITE);
+        btnClear.setPreferredSize(new Dimension(110, 32));
+        btnClear.addActionListener(this);
+
+        buttonPanel.add(btnSave);
+        buttonPanel.add(btnClear);
+        add(buttonPanel);
+
+        addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                dispose();
+                System.exit(0);
+            }
+        });
+
+        setVisible(true);
+    }
+
+    private Panel createRow(String labelText, Component component) {
+        Panel panel = new Panel(new FlowLayout(FlowLayout.LEFT, 15, 4));
+        panel.setPreferredSize(new Dimension(460, 42));
+
+        Label label = new Label(labelText);
+        label.setForeground(Color.WHITE);
+        label.setFont(new Font("Arial", Font.BOLD, 13));
+        label.setPreferredSize(new Dimension(110, 25));
+
+        panel.add(label);
+        panel.add(component);
+        return panel;
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnSave) {
+            showDetailsDialog();
+        } else if (e.getSource() == btnClear) {
+            clearFields();
+        }
+    }
+
+    private void showDetailsDialog() {
+        Dialog dialog = new Dialog(this, "Registration Successful", true);
+        dialog.setLayout(new BorderLayout(10, 10));
+        dialog.setSize(380, 320);
+        dialog.setLocationRelativeTo(this);
+
+        StringBuilder hobbies = new StringBuilder();
+        if (cbDrawing.getState()) hobbies.append("Drawing ");
+        if (cbSinging.getState()) hobbies.append("Singing ");
+        if (cbMusic.getState()) hobbies.append("Music ");
+        if (cbOthers.getState()) hobbies.append("Others ");
+        if (hobbies.length() == 0) hobbies.append("None");
+
+        String info = "Student Registration Details:\n\n"
+                + "• Name: " + txtName.getText() + "\n"
+                + "• Father Name: " + txtFather.getText() + "\n"
+                + "• Age: " + txtAge.getText() + "\n"
+                + "• Gender: " + genderGroup.getSelectedCheckbox().getLabel() + "\n"
+                + "• Course: " + chCourse.getSelectedItem() + "\n"
+                + "• Hobbies: " + hobbies.toString().trim() + "\n"
+                + "• Address: " + txtAddress.getText().replace("\n", ", ");
+
+        TextArea txtDisplay = new TextArea(info, 10, 35, TextArea.SCROLLBARS_VERTICAL_ONLY);
+        txtDisplay.setEditable(false);
+        dialog.add(txtDisplay, BorderLayout.CENTER);
+
+        Button btnOk = new Button("OK");
+        btnOk.addActionListener(event -> dialog.dispose());
+        Panel pnlBottom = new Panel();
+        pnlBottom.add(btnOk);
+        dialog.add(pnlBottom, BorderLayout.SOUTH);
+
+        dialog.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e) {
+                dialog.dispose();
+            }
+        });
+
+        dialog.setVisible(true);
+    }
+
+    private void clearFields() {
+        txtName.setText("");
+        txtFather.setText("");
+        txtAge.setText("");
+        txtAddress.setText("");
+        rbMale.setState(true);
+        chCourse.select(0);
+        cbDrawing.setState(false);
+        cbSinging.setState(false);
+        cbMusic.setState(false);
+        cbOthers.setState(false);
+    }
+
+    public static void main(String[] args) {
+        new StudentRegistrationForm();
+    }
+}
