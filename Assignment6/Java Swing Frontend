@@ -1,0 +1,114 @@
+package com.example;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Vector;
+
+public class EmployeeForm extends JFrame {
+    private JTextField idField, nameField, deptField, salaryField;
+    private JTable table;
+    private DefaultTableModel tableModel;
+    private EmployeeDAO employeeDAO;
+
+    public EmployeeForm() {
+        employeeDAO = new EmployeeDAO();
+
+        setTitle("Employee Management System");
+        setSize(600, 500);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        JPanel formPanel = new JPanel(new GridLayout(5, 2, 10, 10));
+        formPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        formPanel.add(new JLabel("Employee ID (integer):"));
+        idField = new JTextField();
+        formPanel.add(idField);
+
+        formPanel.add(new JLabel("Name (text):"));
+        nameField = new JTextField();
+        formPanel.add(nameField);
+
+        formPanel.add(new JLabel("Department (text):"));
+        deptField = new JTextField();
+        formPanel.add(deptField);
+
+        formPanel.add(new JLabel("Salary (decimal):"));
+        salaryField = new JTextField();
+        formPanel.add(salaryField);
+
+        JButton submitButton = new JButton("Submit");
+        JButton viewButton = new JButton("View All Employees");
+        formPanel.add(submitButton);
+        formPanel.add(viewButton);
+
+        add(formPanel, BorderLayout.NORTH);
+
+        tableModel = new DefaultTableModel();
+        tableModel.addColumn("Employee ID");
+        tableModel.addColumn("Name");
+        tableModel.addColumn("Department");
+        tableModel.addColumn("Salary");
+
+        table = new JTable(tableModel);
+        add(new JScrollPane(table), BorderLayout.CENTER);
+
+        submitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    int empId = Integer.parseInt(idField.getText().trim());
+                    String name = nameField.getText().trim();
+                    String dept = deptField.getText().trim();
+                    double salary = Double.parseDouble(salaryField.getText().trim());
+
+                    boolean success = employeeDAO.addEmployee(empId, name, dept, salary);
+                    if (success) {
+                        JOptionPane.showMessageDialog(null, "Employee added successfully!");
+                        clearFields();
+                        loadTableData(); 
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Failed to add employee. ID might already exist.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null, "Please enter valid numbers for ID and Salary.", "Invalid Input", JOptionPane.WARNING_MESSAGE);
+                }
+            }
+        });
+
+        viewButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                loadTableData();
+            }
+        });
+    }
+
+    private void loadTableData() {
+        tableModel.setRowCount(0); 
+        Vector<Vector<Object>> data = employeeDAO.getAllEmployees();
+        for (Vector<Object> row : data) {
+            tableModel.addRow(row);
+        }
+    }
+
+    private void clearFields() {
+        idField.setText("");
+        nameField.setText("");
+        deptField.setText("");
+        salaryField.setText("");
+    }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new EmployeeForm().setVisible(true);
+            }
+        });
+    }
+}
